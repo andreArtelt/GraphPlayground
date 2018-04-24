@@ -1,0 +1,23 @@
+{
+  "name": "GraphPlayground",
+  "description": "GraphPlayground",
+  "repository": "https://github.com/andreArtelt/GraphPlayground",
+  "license": "MIT",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=8.9.4"
+  },
+  "devDependencies": {
+    "javascript-obfuscator": "0.14.0",
+    "vulcanize": "1.16.0",
+    "grunt": "1.0.2",
+    "grunt-javascript-obfuscator": "1.1.0",
+    "grunt-contrib-htmlmin": "2.4.0",
+    "grunt-contrib-concat": "1.0.1",
+    "grunt-processhtml": "0.4.1",
+    "grunt-vulcanize": "1.0.0",
+    "grunt-contrib-copy": "1.0.0",
+    "grunt-contrib-clean": "1.1.0"
+  },
+  "dependencies": {}
+}

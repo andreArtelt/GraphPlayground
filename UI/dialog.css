@@ -1,0 +1,25 @@
+.dialog {
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 6px;
+}
+
+.dialogBtn {
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    background-color: white; 
+    border: 1px solid #000000;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 20px 2px 0px 0px;
+    cursor: pointer;
+    width: 45%;
+}
+
+.dialogBtn:hover {
+    background-color: #000000;
+    color: white;
+}

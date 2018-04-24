@@ -1,0 +1,147 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF8">
+
+    <!-- build:css inline -->
+    <link href="ThirdPartyComponents/vis.js/vis.min.css" rel="stylesheet" type="text/css"/>
+    <link href="ThirdPartyComponents/vis.js/vis-network.min.css" rel="stylesheet" type="text/css"/>
+
+    <link href="ThirdPartyComponents/dialog-polyfill/dialog-polyfill.css" rel="stylesheet" type="text/css"/>
+
+    <link href="UI/styles.css" rel="stylesheet" type="text/css"/>
+    <link href="UI/dialog.css" rel="stylesheet" type="text/css"/>
+    <!-- /build -->
+
+    <!-- build:js app.js -->
+    <script src="ThirdPartyComponents/vis.js/vis.min.js"></script>
+    <script src="ThirdPartyComponents/graphlib/graphlib.min.js"></script>
+    <script src="ThirdPartyComponents/dialog-polyfill/dialog-polyfill.js"></script>
+
+    <script src="Utils/logger.js"></script>
+
+    <script src="Algorithms/dijkstra.js"></script>
+    <script src="Algorithms/prim.js"></script>
+    <script src="Algorithms/floydwarshall.js"></script>
+    <script src="Algorithms/eulerianpath.js"></script>
+    <script src="Algorithms/traversal.js"></script>
+    <script src="Algorithms/edmondskarps.js"></script>
+
+    <script src="Utils/external-file-format.js"></script>
+    <script src="Utils/utils.js"></script>
+
+    <script src="UI/dialogs.js"></script>
+    <script src="UI/algovis.js"></script>
+    <script src="UI/language-mgr.js"></script>
+    <script src="UI/controller.js"></script>
+    
+    <script src="Utils/castings.js"></script>
+    <!-- /build -->
+
+    <title data-lang-id="TITLE">GraphPlayground</title>
+</head>
+<body>
+    <div id="menu">
+        <ul id="nav">
+            <li><a href="#" id="GRAPH_MENU" data-lang-id="GRAPH">Graph</a>
+                <ul>
+                    <li><a href="#" id="MENU_RESET" data-lang-id="RESET">Reset</a></li>
+                    <li><a href="#" id="MENU_CLEAR" data-lang-id="CLEAR">Clear</a></li>
+                    <li><a href="#" id="MENU_RANDOM" data-lang-id="RANDOM">Random</a></li>
+                    <li><a href="#" data-lang-id="IMPORT_MENU">Import &blacktriangleright;</a>
+                        <ul>
+                            <li><a href="#" id="MENU_IMPORTFROMFILE" data-lang-id="FROM_FILE">From file</a>
+                            <li><a href="#" id="MENU_IMPORTFROMTEXT" data-lang-id="FROM_TEXT">From text</a>
+                        </ul>
+                    </li>
+                    <li><a href="#" data-lang-id="EXPORT_MENU">Export &blacktriangleright;</a>
+                        <ul>
+                            <li><a href="#" id="MENU_EXPORT2FILE" data-lang-id="TO_FILE">To file</a>
+                            <li><a href="#" id="MENU_EXPORT2TEXT" data-lang-id="TO_TEXT">To text</a>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="#" id="ALGORITHMS_MENU" data-lang-id="ALGORITHMS">Algorithms</a>
+                <ul>
+                    <li><a href="#" id="TRAVERSAL_MENU" data-lang-id="TRAVERSAL_MENU">Traversal &blacktriangleright;</a>
+                        <ul>
+                            <li><a href="#" id="MENU_PREORDERTRAVERSAL" data-lang-id="PREORDER_TRAVERSAL">Preorder traversal</a></li>
+                            <li><a href="#" id="MENU_INORDERTRAVERSAL" data-lang-id="INORDER_TRAVERSAL">Inorder traversal</a></li>
+                            <li><a href="#" id="MENU_LEVELORDERTRAVERSAL" data-lang-id="LEVELORDER_TRAVERSAL">Levelorder traversal</a></li>
+                            <li><a href="#" id="MENU_POSTORDERTRAVERSAL" data-lang-id="POSTORDER_TRAVERSAL">Postorder traversal</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#" id="MENU_EULERIANPATH" data-lang-id="EULERIAN_PATH">Eulerian path</a></li>
+                    <li><a href="#" id="MENU_DIJKSTRA" data-lang-id="DIJKSTRA">Dijkstra</a></li>
+                    <li><a href="#" id="MENU_PRIM" data-lang-id="PRIM">Prim</a></li>
+                    <li><a href="#" id="MENU_FLOYDWARSHALL" data-lang-id="FLOYDWARSHALL">Floyd-Warshall</a></li>
+                    <li><a href="#" id="MENU_EDMONDSKARP" data-lang-id="EDMONDSKARP">Edmonds-Karp</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div id="RESULT_VIEW_POPUP" class="invisible">
+            <span id="RESULT_VIEW_POPUP_TEXT" data-lang-id="RESULT_VIEW_POPUP_TEXT">Result view</span>
+            <span id="RESULT_VIEW_POPUP_MOUSEOVER" class="tooltiptext" data-lang-id="RESULT_VIEW_POPUP_MOUSEOVER">You are in the result view! Return to the normal view by pressing 'r' or in the menu 'Graph' -> 'Reset'</span>
+        </div>
+    </div>
+
+    <div id="network-popUp">
+        <span id="operation">node</span> <br>
+        <table style="margin:auto;"><tr>
+          <td>id</td><td><input id="node-id" value="new value" /></td>
+        </tr>
+          <tr>
+            <td>label</td><td><input id="node-label" value="new value" /></td>
+          </tr></table>
+        <input type="button" value="save" id="saveButton" />
+        <input type="button" value="cancel" id="cancelButton" />
+      </div>
+      <br />
+    <div id="graphview"></div>
+
+    <dialog id="editEdgeDlg" class="dialog">
+        <center><h3 data-lang-id="EDIT_EDGE">Edit edge</h3></center>
+            <form method="dialog">
+                <input type="text" id="edgeData"></input><br>
+                <button id="editedgeOkBtn" class="dialogBtn" data-lang-id="OK">Ok</button> 
+                <button id="editedgeCloseBtn" class="dialogBtn" data-lang-id="CANCEL">Cancel</button>
+            </form>
+    </dialog>
+    
+    <dialog id="editNodeDlg" class="dialog">
+        <center><h3 data-lang-id="EDIT_NODE">Edit node</h3></center>
+            <form method="dialog">
+                <input type="text" id="nodeData"></input><br>
+                <button id="editnodeOkBtn" class="dialogBtn" data-lang-id="OK">Ok</button> 
+                <button id="editnodeCloseBtn" class="dialogBtn" data-lang-id="CANCEL">Cancel</button>
+            </form>
+    </dialog>
+
+    <dialog id="addNodeDlg" class="dialog">
+        <center><h3 data-lang-id="ADD_NODE">Add node</h3></center>
+            <form method="dialog">
+                <input type="text" id="nodeId"></input><br>
+                <button id="addnodeOkBtn" class="dialogBtn" data-lang-id="OK">Ok</button> 
+                <button id="addnodeCloseBtn" class="dialogBtn" data-lang-id="CANCEL">Cancel</button>
+            </form>
+    </dialog>
+
+    <dialog id="importDlg" class="dialog">
+        <center><h3 data-lang-id="IMPORT">Import</h3></center>
+            <form method="dialog">
+                <textarea id="importData" cols=50 rows=30></textarea><br>
+                <button id="importBtn" class="dialogBtn" data-lang-id="IMPORT">Import</button> 
+                <button id="importCloseBtn" class="dialogBtn" data-lang-id="CANCEL">Cancel</button>
+            </form>
+    </dialog>
+
+    <dialog id="exportDlg" class="dialog">
+        <center><h3 data-lang-id="EXPORT">Export</h3></center>
+            <form method="dialog">
+                <textarea id="exportData" cols=50 rows=30></textarea><br>
+                <button id="exportCloseBtn" class="dialogBtn" data-lang-id="CLOSE">Close</button>
+            </form>
+    </dialog>
+</body>
+</html>
