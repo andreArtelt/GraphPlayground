@@ -75,7 +75,7 @@ ui.Controller = function() {
       document.getElementById("MENU_EULERIANPATH").addEventListener("click", this.onClickEulerianPath.bind(this), false);
       document.getElementById("MENU_DIJKSTRA").addEventListener("click", this.onClickDijkstra.bind(this), false);
       document.getElementById("MENU_PRIM").addEventListener("click", this.onClickPrim.bind(this), false);
-      document.getElementById("MENU_FLOYDWARSHALL").addEventListener("click", this.onClickFloydWarshall.bind(this), false);
+      //document.getElementById("MENU_FLOYDWARSHALL").addEventListener("click", this.onClickFloydWarshall.bind(this), false);
       document.getElementById("MENU_EDMONDSKARP").addEventListener("click", this.onClickEdmondsKarp.bind(this), false);
       
       this.registerSpecialEventHandler();
@@ -312,7 +312,7 @@ ui.Controller = function() {
     document.getElementById("MENU_EULERIANPATH").removeAttribute("class");
     document.getElementById("MENU_DIJKSTRA").removeAttribute("class");
     document.getElementById("MENU_PRIM").removeAttribute("class");
-    document.getElementById("MENU_FLOYDWARSHALL").removeAttribute("class");
+    //document.getElementById("MENU_FLOYDWARSHALL").removeAttribute("class");
     document.getElementById("MENU_EDMONDSKARP").removeAttribute("class");
   };
 
@@ -326,7 +326,7 @@ ui.Controller = function() {
     document.getElementById("MENU_EULERIANPATH").setAttribute("class", "disabled");
     document.getElementById("MENU_DIJKSTRA").setAttribute("class", "disabled");
     document.getElementById("MENU_PRIM").setAttribute("class", "disabled");
-    document.getElementById("MENU_FLOYDWARSHALL").setAttribute("class", "disabled");
+    //document.getElementById("MENU_FLOYDWARSHALL").setAttribute("class", "disabled");
     document.getElementById("MENU_EDMONDSKARP").setAttribute("class", "disabled");
   };
     
