@@ -15,7 +15,6 @@ Supported algorithms:
 - Eulerian path by using Hierholzer's algorithm (*Only one path is computed. However, there might exist more than one path*)
 - Dijkstra
 - Prim
-- Floyd-Warshall
 - Edmond-Karps
 - Pre-/In-/Post-/Levelorder traversal
 
