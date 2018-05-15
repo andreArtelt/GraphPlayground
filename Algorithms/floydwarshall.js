@@ -13,8 +13,12 @@ algo.floydWarshall = function(graph) {
         edgeFn = v => graphIn.outEdges(v);
     }
 
-    return graphlib.alg.floydWarshall(graphIn, e => {
+    var t =  graphlib.alg.floydWarshall(graphIn, e => {
         var w = graphIn.edge(e.v, e.w);
-        return w == undefined ? 1.0 : w;
+        return w == undefined ? 1.0 : parseFloat(w);
     }, edgeFn);
+
+    console.log(t);
+
+    return t;
 };

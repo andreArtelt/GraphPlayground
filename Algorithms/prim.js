@@ -9,7 +9,7 @@ algo.prim = function(graph) {
 
     var resultGraph = graphlib.alg.prim(graph, e => {
         var w = graph.edge(e.v, e.w);
-        return w == undefined ? 1.0 : w;
+        return w == undefined ? 1.0 : parseFloat(w);
     });
 
     utils.graphlibAddOriginalEdgeLabels(resultGraph, graph);

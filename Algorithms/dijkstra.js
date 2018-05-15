@@ -15,6 +15,6 @@ algo.dijkstra = function(graph, startNode) {
 
     return graphlib.alg.dijkstra(graphIn, startNode, e => {
         var w = graphIn.edge(e);
-        return w == undefined ? 1.0 : w;
+        return w == undefined ? 1.0 : parseFloat(w);
     }, edgeFn);
 };
