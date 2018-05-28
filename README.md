@@ -16,6 +16,8 @@ Supported algorithms:
 - Dijkstra
 - Prim
 - Edmond-Karps
+- Find a negative-weight cycle (*There might exist more than on cycle!*)
+- Aribtrage as an application of finding a negative-weight cycle
 - Pre-/In-/Post-/Levelorder traversal
 
 ## Usage

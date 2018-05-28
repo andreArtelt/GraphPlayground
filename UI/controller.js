@@ -6,7 +6,8 @@ ui.DefaultGraphFileName = "myGraph.txt";
 
 ui.Controller = function() {
   const Algorithms = {PREORDER_TRAVERSAL: 0, INORDER_TRAVERSAL: 1, LEVELORDER_TRAVERSAL: 2, POSTORDER_TRAVERSAL: 3,
-                      PRIM: 4, DIJKSTRA: 5, EULERIAN_PATH: 6, FLOYDWARSHALL: 7, EDMONDSKARP: 8};
+                      PRIM: 4, DIJKSTRA: 5, EULERIAN_PATH: 6, FLOYDWARSHALL: 7, EDMONDSKARP: 8, NEGATIVEWEIGHT_CYCLE: 9,
+                      ARBITRAGE: 10};
 
   this.viewContainer = document.getElementById("graphview");
   this.network = undefined;
@@ -77,7 +78,9 @@ ui.Controller = function() {
       document.getElementById("MENU_PRIM").addEventListener("click", this.onClickPrim.bind(this), false);
       //document.getElementById("MENU_FLOYDWARSHALL").addEventListener("click", this.onClickFloydWarshall.bind(this), false);
       document.getElementById("MENU_EDMONDSKARP").addEventListener("click", this.onClickEdmondsKarp.bind(this), false);
-      
+      document.getElementById("MENU_NEGATIVEWEIGHTCYCLE").addEventListener("click", this.onClickNegativeWeightCycle.bind(this), false);
+      document.getElementById("MENU_ARBITRAGE").addEventListener("click", this.onClickArbitrage.bind(this), false);
+
       this.registerSpecialEventHandler();
 
       // Create random graph
@@ -305,6 +308,7 @@ ui.Controller = function() {
   this.enableAlgoMenu = function() {
     document.getElementById("ALGORITHMS_MENU").removeAttribute("class");
     document.getElementById("TRAVERSAL_MENU").removeAttribute("class");
+    document.getElementById("APPLICATIONS_MENU").removeAttribute("class");
     document.getElementById("MENU_PREORDERTRAVERSAL").removeAttribute("class");
     document.getElementById("MENU_INORDERTRAVERSAL").removeAttribute("class");
     document.getElementById("MENU_LEVELORDERTRAVERSAL").removeAttribute("class");
@@ -314,11 +318,14 @@ ui.Controller = function() {
     document.getElementById("MENU_PRIM").removeAttribute("class");
     //document.getElementById("MENU_FLOYDWARSHALL").removeAttribute("class");
     document.getElementById("MENU_EDMONDSKARP").removeAttribute("class");
+    document.getElementById("MENU_NEGATIVEWEIGHTCYCLE").removeAttribute("class");
+    document.getElementById("MENU_ARBITRAGE").removeAttribute("class");
   };
 
   this.disableAlgoMenu = function() {
     document.getElementById("ALGORITHMS_MENU").setAttribute("class", "disabled");
     document.getElementById("TRAVERSAL_MENU").setAttribute("class", "disabled");
+    document.getElementById("APPLICATIONS_MENU").setAttribute("class", "disabled");
     document.getElementById("MENU_PREORDERTRAVERSAL").setAttribute("class", "disabled");
     document.getElementById("MENU_INORDERTRAVERSAL").setAttribute("class", "disabled");
     document.getElementById("MENU_LEVELORDERTRAVERSAL").setAttribute("class", "disabled");
@@ -328,6 +335,8 @@ ui.Controller = function() {
     document.getElementById("MENU_PRIM").setAttribute("class", "disabled");
     //document.getElementById("MENU_FLOYDWARSHALL").setAttribute("class", "disabled");
     document.getElementById("MENU_EDMONDSKARP").setAttribute("class", "disabled");
+    document.getElementById("MENU_NEGATIVEWEIGHTCYCLE").setAttribute("class", "disabled");
+    document.getElementById("MENU_ARBITRAGE").setAttribute("class", "disabled");
   };
     
   this.enableResultViewPopup = function() {
@@ -456,7 +465,13 @@ ui.Controller = function() {
       } break;
       case Algorithms.EDMONDSKARP: {
         this.onToggleResultViewEdmondsKarp();
-      };
+      } break;
+      case Algorithms.NEGATIVEWEIGHT_CYCLE: {
+        this.onToggleResultViewNegativeWeightCycle();
+      } break;
+      case Algorithms.ARBITRAGE: {
+        this.onToggleResultViewArbitrage();
+      } break;
     }
   };
 
@@ -601,6 +616,43 @@ ui.Controller = function() {
 
       this.algoResult.viewState = false;
     }
+  };
+
+  this.onToggleResultViewNegativeWeightCycle = function() {
+    if(this.algoResult.viewState == true) {
+      // Highlight nodes of cycle
+      algovis.highlightNodes(this.graph, this.algoResult.data.cycle, x => algovis.colorStartNodeBackground);
+
+      // Highlight edges of cycle
+      algovis.highlightEdges(this.graph, this.algoResult.data.route, algovis.colorStartNodeBackground, this.directedGraph);
+
+      this.algoResult.viewState = false;
+    }
+  };
+
+  this.onToggleResultViewArbitrage = function() {
+    if(this.algoResult.viewState == true) {
+      this.graph = utils.cloneVisGraph(this.algoResult.data.resultGraph);
+      this.graph.edges.forEach(edge => {
+        edge.label = parseFloat(edge.label).toFixed(2);
+        this.graph.edges.update(edge);
+      });
+
+      this.algoResult.viewState = false;
+    }
+    else {
+      this.graph = utils.cloneVisGraph(this.algoResult.oldGraph);
+
+      this.algoResult.viewState = true;
+    }
+
+    this.redraw();
+
+    // Highlight nodes of cycle
+    algovis.highlightNodes(this.graph, this.algoResult.data.cycle, x => algovis.colorStartNodeBackground);
+
+    // Highlight edges of cycle
+    algovis.highlightEdges(this.graph, this.algoResult.data.route, algovis.colorStartNodeBackground, this.directedGraph);
   };
 
   this.forceNodeSelection = function(n) {
@@ -930,6 +982,65 @@ ui.Controller = function() {
 
         this.onToggleResultView();
       }
+    }
+    catch(err) {
+      logger.exception(err);
+    }
+  };
+
+  this.onClickNegativeWeightCycle = function() {
+    try {
+      var graphIn = this.vis2Graphlib(this.graph);
+      var result = algo.findNegativeWeightCycle(graphIn);
+
+      logger.info(result);
+
+      this.algoResult.oldGraph = utils.cloneVisGraph(this.graph);
+      this.algoResult.algo = Algorithms.NEGATIVEWEIGHT_CYCLE;
+      this.algoResult.data = {
+        cycle: result.cycle,
+        route: result.route
+      };
+      this.algoResult.options = {
+        edges: {
+          selectionWidth: 0.0
+        }
+      };
+      this.algoResult.viewState = true;
+
+      this.selectNodes([]);
+
+      this.onToggleResultView();
+    }
+    catch(err) {
+      logger.exception(err);
+    }
+  };
+  
+  this.onClickArbitrage = function() {
+    try {
+      var graphIn = this.vis2Graphlib(this.graph);
+      var result = algo.arbitrage(graphIn);
+
+      logger.info(result);
+
+      this.algoResult.oldGraph = utils.cloneVisGraph(this.graph);
+      this.algoResult.algo = Algorithms.ARBITRAGE;
+      this.algoResult.data = {
+        cycle: result.cycle,
+        route: result.route,
+        resultGraph: this.graphlib2Vis(result.logGraph)
+      };
+      this.algoResult.options = {
+        edges: {
+          selectionWidth: 0.0
+        }
+      };
+      this.algoResult.viewState = true;
+
+      this.selectNodes([]);
+
+      this.onToggleResultView();
     }
     catch(err) {
       logger.exception(err);
