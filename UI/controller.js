@@ -7,7 +7,7 @@ ui.DefaultGraphFileName = "myGraph.txt";
 ui.Controller = function() {
   const Algorithms = {PREORDER_TRAVERSAL: 0, INORDER_TRAVERSAL: 1, LEVELORDER_TRAVERSAL: 2, POSTORDER_TRAVERSAL: 3,
                       PRIM: 4, DIJKSTRA: 5, EULERIAN_PATH: 6, FLOYDWARSHALL: 7, EDMONDSKARP: 8, NEGATIVEWEIGHT_CYCLE: 9,
-                      ARBITRAGE: 10};
+                      ARBITRAGE: 10, BELLMANFORD: 11};
 
   this.viewContainer = document.getElementById("graphview");
   this.network = undefined;
@@ -76,7 +76,8 @@ ui.Controller = function() {
       document.getElementById("MENU_EULERIANPATH").addEventListener("click", this.onClickEulerianPath.bind(this), false);
       document.getElementById("MENU_DIJKSTRA").addEventListener("click", this.onClickDijkstra.bind(this), false);
       document.getElementById("MENU_PRIM").addEventListener("click", this.onClickPrim.bind(this), false);
-      //document.getElementById("MENU_FLOYDWARSHALL").addEventListener("click", this.onClickFloydWarshall.bind(this), false);
+      document.getElementById("MENU_BELLMANFORD").addEventListener("click", this.onClickBellmanFord.bind(this), false);
+      document.getElementById("MENU_FLOYDWARSHALL").addEventListener("click", this.onClickFloydWarshall.bind(this), false);
       document.getElementById("MENU_EDMONDSKARP").addEventListener("click", this.onClickEdmondsKarp.bind(this), false);
       document.getElementById("MENU_NEGATIVEWEIGHTCYCLE").addEventListener("click", this.onClickNegativeWeightCycle.bind(this), false);
       document.getElementById("MENU_ARBITRAGE").addEventListener("click", this.onClickArbitrage.bind(this), false);
@@ -316,7 +317,8 @@ ui.Controller = function() {
     document.getElementById("MENU_EULERIANPATH").removeAttribute("class");
     document.getElementById("MENU_DIJKSTRA").removeAttribute("class");
     document.getElementById("MENU_PRIM").removeAttribute("class");
-    //document.getElementById("MENU_FLOYDWARSHALL").removeAttribute("class");
+    document.getElementById("MENU_BELLMANFORD").removeAttribute("class");
+    document.getElementById("MENU_FLOYDWARSHALL").removeAttribute("class");
     document.getElementById("MENU_EDMONDSKARP").removeAttribute("class");
     document.getElementById("MENU_NEGATIVEWEIGHTCYCLE").removeAttribute("class");
     document.getElementById("MENU_ARBITRAGE").removeAttribute("class");
@@ -333,7 +335,8 @@ ui.Controller = function() {
     document.getElementById("MENU_EULERIANPATH").setAttribute("class", "disabled");
     document.getElementById("MENU_DIJKSTRA").setAttribute("class", "disabled");
     document.getElementById("MENU_PRIM").setAttribute("class", "disabled");
-    //document.getElementById("MENU_FLOYDWARSHALL").setAttribute("class", "disabled");
+    document.getElementById("MENU_BELLMANFORD").setAttribute("class", "disabled");
+    document.getElementById("MENU_FLOYDWARSHALL").setAttribute("class", "disabled");
     document.getElementById("MENU_EDMONDSKARP").setAttribute("class", "disabled");
     document.getElementById("MENU_NEGATIVEWEIGHTCYCLE").setAttribute("class", "disabled");
     document.getElementById("MENU_ARBITRAGE").setAttribute("class", "disabled");
@@ -460,6 +463,9 @@ ui.Controller = function() {
       case Algorithms.DIJKSTRA: {
         this.onToggleResultViewDijkstra();
       } break;
+      case Algorithms.BELLMANFORD: {
+        this.onToggleResultViewBellmanFord();
+      } break;
       case Algorithms.FLOYDWARSHALL: {
         this.onToggleResultViewFloydWarshall();
       } break;
@@ -550,6 +556,54 @@ ui.Controller = function() {
       var curNode = endNode;
       while(curNode != startNode) {
         var nextNode = this.algoResult.data.distPredMap[curNode].predecessor;
+        if(nextNode == undefined) {
+          logger.exception(ui.languageMgr.translateId("NODE_CAN_NOT_BE_REACHED"));
+          return;
+        }
+
+        route.push({from: nextNode, to: curNode});
+
+        curNode = nextNode;
+      }
+    }
+
+    // Highlight start and end node
+    algovis.highlightNodes(this.graph, nodes, x => x == startNode ? algovis.colorStartNodeBackground : algovis.colorEndNodeBackground);
+
+    // Highlight route between start and end node
+    algovis.highlightEdges(this.graph, route, algovis.colorPath, this.directedGraph);
+  };
+
+  this.onToggleResultViewBellmanFord = function() {
+    // Get start and end node
+    var startNode = this.algoResult.data.startNode;
+    var endNode = this.curNodes[0];
+
+    var nodes = [startNode];
+
+    if(endNode != undefined && endNode != startNode) {
+      nodes.push(endNode);
+    }
+
+    // Get edges of route between them
+    var route = [];
+    var visitedNodes = [];
+    if(nodes.length == 2) {
+      var curNode = endNode;
+      visitedNodes.push(curNode);
+
+      while(curNode != startNode) {
+        var nextNode = this.algoResult.data.pred[curNode];
+        if(nextNode == undefined) {
+          logger.exception(ui.languageMgr.translateId("NODE_CAN_NOT_BE_REACHED"));
+          return;
+        }
+
+        if(visitedNodes.indexOf(nextNode) != -1) {
+          logger.exception(ui.languageMgr.translateId("NEGATIVEWEIGHT_CYCLE_DETECTED"));
+          return;
+        }
+        visitedNodes.push(nextNode);
 
         route.push({from: nextNode, to: curNode});
 
@@ -580,18 +634,25 @@ ui.Controller = function() {
 
     // Get edges of route between them
     var route = [];
-    var distPredMap = this.algoResult.data.allDistPredMap[startNode];
+    var visitedNodes = [];
     if(nodes.length == 2) {
-      var curNode = endNode;
-      while(curNode != startNode) {
-        if(distPredMap[curNode] == undefined) {
-          logger.exception(ui.languageMgr.translateId("NODE_CAN_NOT_BE_REACHED"));
+      if(this.algoResult.data.next[startNode][endNode] == undefined) {
+        logger.exception(ui.languageMgr.translateId("NODE_CAN_NOT_BE_REACHED"));
+        return;
+      }
+
+      var curNode = startNode;
+      visitedNodes.push(curNode);
+      while(curNode != endNode) {
+        var nextNode = this.algoResult.data.next[curNode][endNode];
+
+        if(visitedNodes.indexOf(nextNode) != -1) {
+          logger.exception(ui.languageMgr.translateId("NEGATIVEWEIGHT_CYCLE_DETECTED"));
           return;
         }
+        visitedNodes.push(nextNode);
 
-        var nextNode = distPredMap[curNode].predecessor;
-
-        route.push({from: nextNode, to: curNode});
+        route.push({from: curNode, to: nextNode});
 
         curNode = nextNode;
       }
@@ -927,17 +988,55 @@ ui.Controller = function() {
     }
   };
 
+  this.onClickBellmanFord = function() {
+    try {
+        if(this.forceNodeSelection()) {
+          var startNode = this.curNodes[0];
+          var graphIn = this.vis2Graphlib(this.graph);
+          
+          var results = algo.bellmanFord(graphIn, startNode);
+
+          logger.info(results);
+
+          this.algoResult.oldGraph = utils.cloneVisGraph(this.graph);
+          this.algoResult.algo = Algorithms.BELLMANFORD;
+          this.algoResult.data = {
+            startNode: startNode,
+            dist: results.dist,
+            pred: results.pred
+          };
+          this.algoResult.eventHooks.onselect = {
+            post: this.onToggleResultViewBellmanFord.bind(this)
+          };
+          this.algoResult.options = {
+            edges: {
+              selectionWidth: 0.0
+            }
+          };
+          this.algoResult.viewState = true;
+
+          this.selectNodes([]);
+
+          this.onToggleResultView();
+      }
+    }
+    catch(err) {
+      logger.exception(err);
+    }
+  };
+
   this.onClickFloydWarshall = function() {
     try {
       var graphIn = this.vis2Graphlib(this.graph);
-      var allDistPredMap = algo.floydWarshall(graphIn);
+      var results = algo.floydWarshall(graphIn);
 
-      logger.info(allDistPredMap);
+      logger.info(results);
 
       this.algoResult.oldGraph = utils.cloneVisGraph(this.graph);
       this.algoResult.algo = Algorithms.FLOYDWARSHALL;
       this.algoResult.data = {
-        allDistPredMap: allDistPredMap
+        dist: results.dist,
+        next: results.next
       };
       this.algoResult.eventHooks.onselect = {
         post: this.onToggleResultViewFloydWarshall.bind(this)

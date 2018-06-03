@@ -2,9 +2,9 @@
 
 var algo = algo || {};
 
-algo.floydWarshall = function(graph) {
+algo.bellmanFord = function(graph, startNode) {
     var dist = {};
-    var next = {};
+    var pred = {};
 
     // Convert an undirected graph into a directed graph
     var graphIn = utils.cloneGraphlibGraph(graph);
@@ -17,6 +17,7 @@ algo.floydWarshall = function(graph) {
 
         graph.edges().forEach(edge => {
             var weight = graph.edge(edge.v, edge.w);
+
             graphIn.setEdge(edge.v, edge.w, weight);
             graphIn.setEdge(edge.w, edge.v, weight);
         });
@@ -31,33 +32,23 @@ algo.floydWarshall = function(graph) {
         graphIn.setEdge(edge.v, edge.w, weight);
     });
 
-    // Initalize arrays
+    // Initialize arrays
     graphIn.nodes().forEach(node => {
-        next[node] = {};
-        dist[node] = {};
-        
-        graphIn.nodes().forEach(n => {
-            next[node][n] = undefined;
-            dist[node][n] = Infinity;
+        dist[node] = Infinity;
+        pred[node] = undefined;
+    });
+    dist[startNode] = 0.0;
+
+    // Compute distances & predecessors
+    for(var i=0; i != graphIn.nodes().length - 1; i++) {
+        graphIn.edges().forEach(edge => {
+            var weight = parseFloat(graphIn.edge(edge));
+            if(dist[edge.v] + weight < dist[edge.w]) {
+                dist[edge.w] = dist[edge.v] + weight;
+                pred[edge.w] = edge.v;
+            }
         });
-    });
+    }
 
-    graphIn.edges().forEach(edge => {
-        dist[edge.v][edge.w] = parseFloat(graphIn.edge(edge.v, edge.w));
-        next[edge.v][edge.w] = edge.w;
-    });
-
-    // Compute distance & predecessors
-    graphIn.nodes().forEach(k => {
-        graphIn.nodes().forEach(i => {
-            graphIn.nodes().forEach(j => {
-                if(dist[i][j] > dist[i][k] + dist[k][j]) {
-                    dist[i][j] = dist[i][k] + dist[k][j];
-                    next[i][j] = next[i][k];
-                }
-            });
-        });
-    });
-
-    return {dist: dist, next: next};
+    return {dist: dist, pred: pred};
 };

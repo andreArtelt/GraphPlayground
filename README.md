@@ -13,8 +13,10 @@ You can create, import, export and visualize graphs. Furthermore, you can run al
 Supported algorithms:
 
 - Eulerian path by using Hierholzer's algorithm (*Only one path is computed. However, there might exist more than one path*)
-- Dijkstra
 - Prim
+- Dijkstra
+- Bellman-Ford
+- Floyd-Warshall
 - Edmond-Karps
 - Find a negative-weight cycle (*There might exist more than on cycle!*)
 - Aribtrage as an application of finding a negative-weight cycle
