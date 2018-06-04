@@ -12,7 +12,7 @@ You can create, import, export and visualize graphs. Furthermore, you can run al
 
 Supported algorithms:
 
-- Eulerian path by using Hierholzer's algorithm (*Only one path is computed. However, there might exist more than one path*)
+- Eulerian path/cycle by using Hierholzer's algorithm (*Only one path is computed. However, there might exist more than one path*)
 - Prim
 - Dijkstra
 - Bellman-Ford
@@ -20,6 +20,7 @@ Supported algorithms:
 - Edmond-Karps
 - Find a negative-weight cycle (*There might exist more than on cycle!*)
 - Aribtrage as an application of finding a negative-weight cycle
+- 2-Approximation of the TSP as an application of finding a minimal spanning tree and eulerian path/cycle
 - Pre-/In-/Post-/Levelorder traversal
 
 ## Usage
