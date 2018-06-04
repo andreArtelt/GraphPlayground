@@ -7,7 +7,7 @@ ui.DefaultGraphFileName = "myGraph.txt";
 ui.Controller = function() {
   const Algorithms = {PREORDER_TRAVERSAL: 0, INORDER_TRAVERSAL: 1, LEVELORDER_TRAVERSAL: 2, POSTORDER_TRAVERSAL: 3,
                       PRIM: 4, DIJKSTRA: 5, EULERIAN_PATH: 6, FLOYDWARSHALL: 7, EDMONDSKARP: 8, NEGATIVEWEIGHT_CYCLE: 9,
-                      ARBITRAGE: 10, BELLMANFORD: 11};
+                      ARBITRAGE: 10, BELLMANFORD: 11, TSPAPPROX: 12};
 
   this.viewContainer = document.getElementById("graphview");
   this.network = undefined;
@@ -81,6 +81,7 @@ ui.Controller = function() {
       document.getElementById("MENU_EDMONDSKARP").addEventListener("click", this.onClickEdmondsKarp.bind(this), false);
       document.getElementById("MENU_NEGATIVEWEIGHTCYCLE").addEventListener("click", this.onClickNegativeWeightCycle.bind(this), false);
       document.getElementById("MENU_ARBITRAGE").addEventListener("click", this.onClickArbitrage.bind(this), false);
+      document.getElementById("MENU_TSPAPPROX").addEventListener("click", this.onClickTspApprox.bind(this), false);
 
       this.registerSpecialEventHandler();
 
@@ -322,6 +323,7 @@ ui.Controller = function() {
     document.getElementById("MENU_EDMONDSKARP").removeAttribute("class");
     document.getElementById("MENU_NEGATIVEWEIGHTCYCLE").removeAttribute("class");
     document.getElementById("MENU_ARBITRAGE").removeAttribute("class");
+    document.getElementById("MENU_TSPAPPROX").removeAttribute("class");
   };
 
   this.disableAlgoMenu = function() {
@@ -340,6 +342,7 @@ ui.Controller = function() {
     document.getElementById("MENU_EDMONDSKARP").setAttribute("class", "disabled");
     document.getElementById("MENU_NEGATIVEWEIGHTCYCLE").setAttribute("class", "disabled");
     document.getElementById("MENU_ARBITRAGE").setAttribute("class", "disabled");
+    document.getElementById("MENU_TSPAPPROX").setAttribute("class", "disabled");
   };
     
   this.enableResultViewPopup = function() {
@@ -477,6 +480,9 @@ ui.Controller = function() {
       } break;
       case Algorithms.ARBITRAGE: {
         this.onToggleResultViewArbitrage();
+      } break;
+      case Algorithms.TSPAPPROX: {
+        this.onToggleResultViewTspApprox();
       } break;
     }
   };
@@ -714,6 +720,21 @@ ui.Controller = function() {
 
     // Highlight edges of cycle
     algovis.highlightEdges(this.graph, this.algoResult.data.route, algovis.colorStartNodeBackground, this.directedGraph);
+  };
+
+  this.onToggleResultViewTspApprox = function() {
+    if(this.algoResult.viewState == true) {
+      this.graph = utils.cloneVisGraph(this.algoResult.data.resultGraph);
+
+      this.algoResult.viewState = false;
+    }
+    else {
+      this.graph = utils.cloneVisGraph(this.algoResult.oldGraph);
+
+      this.algoResult.viewState = true;
+    }
+
+    this.redraw();
   };
 
   this.forceNodeSelection = function(n) {
@@ -1129,6 +1150,34 @@ ui.Controller = function() {
         cycle: result.cycle,
         route: result.route,
         resultGraph: this.graphlib2Vis(result.logGraph)
+      };
+      this.algoResult.options = {
+        edges: {
+          selectionWidth: 0.0
+        }
+      };
+      this.algoResult.viewState = true;
+
+      this.selectNodes([]);
+
+      this.onToggleResultView();
+    }
+    catch(err) {
+      logger.exception(err);
+    }
+  };
+
+  this.onClickTspApprox = function() {
+    try {
+      var graphIn = this.vis2Graphlib(this.graph);
+      var result = algo.approxTsp(graphIn);
+
+      logger.info(result);
+
+      this.algoResult.oldGraph = utils.cloneVisGraph(this.graph);
+      this.algoResult.algo = Algorithms.TSPAPPROX;
+      this.algoResult.data = {
+        resultGraph: this.graphlib2Vis(result.tourGraph)
       };
       this.algoResult.options = {
         edges: {
