@@ -49,18 +49,9 @@ utils.cloneGraphlibGraph = function(graphIn, forceUndirected) {
     return graphOut;
 }
 
-utils.writeFile = function(filename, data) {
-    // Create invisible link and click on it
-    var link = document.createElement('a');
-    link.setAttribute('href', 'data:text/plain;charset=utf-8,' + data);
-    link.setAttribute('download', filename);
-    link.style.display = 'none';
-
-    document.body.appendChild(link);
-    link.click();
-
-    // Remove link
-    document.body.removeChild(link);
+utils.writeFile = function(filename, data, type) {
+    var dataBlob = new Blob([data], {type: type == undefined ? 'text/plain' : type});
+    saveAs(dataBlob, filename);
 };
 
 utils.readFileAsync = function(callback) {

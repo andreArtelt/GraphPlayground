@@ -3,6 +3,8 @@
 var ui = ui || {};
 
 ui.DefaultGraphFileName = "myGraph.txt";
+ui.DefaultSvgFileName = "myGraph.svg";
+ui.svgData = undefined;
 
 ui.Controller = function() {
   const Algorithms = {PREORDER_TRAVERSAL: 0, INORDER_TRAVERSAL: 1, LEVELORDER_TRAVERSAL: 2, POSTORDER_TRAVERSAL: 3,
@@ -187,6 +189,9 @@ ui.Controller = function() {
       }
       else if(evt.key == "r") {
         this.onClickReset();
+      }
+      else if(evt.key == "v") {
+        this.onExportSvg();
       }
 
       this.triggerEventHooks("keyup", "post", evt);
@@ -422,6 +427,42 @@ ui.Controller = function() {
 
   this.exportGraph = function() {
     return utils.export(castings.vis2Graphlib(this.graph, true));
+  };
+
+  this.onExportSvg = function() {
+    // Credits: Slightly modified version from https://github.com/justinharrell/vis-svg/
+    // Setup everything
+    C2S.prototype.circle = CanvasRenderingContext2D.prototype.circle;
+    C2S.prototype.square = CanvasRenderingContext2D.prototype.square;
+    C2S.prototype.triangle = CanvasRenderingContext2D.prototype.triangle;
+    C2S.prototype.triangleDown = CanvasRenderingContext2D.prototype.triangleDown;
+    C2S.prototype.star = CanvasRenderingContext2D.prototype.star;
+    C2S.prototype.diamond = CanvasRenderingContext2D.prototype.diamond;
+    C2S.prototype.roundRect = CanvasRenderingContext2D.prototype.roundRect;
+    C2S.prototype.ellipse_vis = CanvasRenderingContext2D.prototype.ellipse_vis;
+    C2S.prototype.database = CanvasRenderingContext2D.prototype.database;
+    C2S.prototype.arrowEndpoint = CanvasRenderingContext2D.prototype.arrowEndpoint;
+    C2S.prototype.circleEndpoint = CanvasRenderingContext2D.prototype.circleEndpoint;
+    C2S.prototype.dashedLine = CanvasRenderingContext2D.prototype.dashedLine;
+
+    var networkContainer = this.network.body.container;
+    var ctx = new C2S({width: networkContainer.clientWidth, height: networkContainer.clientWidth});
+    var canvasProto = this.network.canvas.__proto__;
+    var currentGetContext = canvasProto.getContext;
+    canvasProto.getContext = function(){
+        return ctx;
+    }
+
+    this.network.redraw();
+    canvasProto.getContext = currentGetContext; // Restore old state
+
+    // Export to .svg
+    ctx.waitForComplete(function()
+        {
+            var svgData = ctx.getSerializedSvg();
+
+            utils.writeFile(ui.DefaultSvgFileName, svgData, 'image/svg+xml');
+        });
   };
 
   this.onClickExportToFile = function() {

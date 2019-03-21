@@ -77,6 +77,11 @@ Sometimes you can switch between different views by pressing 't'.
 ### Leave the result view and return to the default view
 Press 'r' or click on "Graph" -> "Reset".
 
+### Export the graph as an image
+
+- If you want to export the graph as an *.png* image, right click on the graph and click on "Save image as".
+- If you want to export the graph as an *.svg* image, press the key "v" and open or save the .svg file.
+
 ## Requirements
 
 - Modern web browser (this application was testet with Firefox 59 and Chromium 65)
@@ -101,6 +106,8 @@ You can delete all files and directories created by `make` by running `make clea
 - [dialog-polyfill](https://github.com/GoogleChrome/dialog-polyfill)
 - [graphlib](https://github.com/dagrejs/graphlib)
 - [vis.js](https://github.com/almende/vis)
+- [canvas2svg.js](https://github.com/gliffy/canvas2svg)
+- [FileSaver.js](https://github.com/eligrey/FileSaver.js)
 
 For building only:
 
