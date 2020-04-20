@@ -71,6 +71,7 @@ ui.Controller = function() {
       document.getElementById("MENU_IMPORTFROMFILE").addEventListener("click", this.onClickImportFromFile.bind(this), false);
       document.getElementById("MENU_EXPORT2TEXT").addEventListener("click", this.onClickExportToText.bind(this), false);
       document.getElementById("MENU_EXPORT2FILE").addEventListener("click", this.onClickExportToFile.bind(this), false);
+      document.getElementById("MENU_EXPORT2SVG").addEventListener("click", this.onExportSvg.bind(this), false);
       document.getElementById("MENU_PREORDERTRAVERSAL").addEventListener("click", this.onClickPreoderTraversal.bind(this), false);
       document.getElementById("MENU_INORDERTRAVERSAL").addEventListener("click", this.onClickInorderTraversal.bind(this), false);
       document.getElementById("MENU_LEVELORDERTRAVERSAL").addEventListener("click", this.onClickLevelorderTraversal.bind(this), false);
