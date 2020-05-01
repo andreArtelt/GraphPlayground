@@ -13,6 +13,7 @@ ui.Controller = function() {
                       ARBITRAGE: 10, BELLMANFORD: 11, TSPAPPROX: 12};
 
   this.viewContainer = document.getElementById("graphview");
+  this.usePhysics = true;
   this.network = undefined;
   this.graph = undefined;
   this.curNodes = [];
@@ -107,6 +108,9 @@ ui.Controller = function() {
     }
 
     var options = {
+      physics: {
+        enabled: this.usePhysics
+      },
       layout: {
         randomSeed: 42
       },
@@ -195,6 +199,10 @@ ui.Controller = function() {
       }
       else if(evt.key == "v") {
         this.onExportSvg();
+      }
+      else if(evt.key == "q") {
+        this.usePhysics = !this.usePhysics;
+        this.redrawKeepView();
       }
 
       this.triggerEventHooks("keyup", "post", evt);

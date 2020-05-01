@@ -32,6 +32,7 @@ The usage of the application should be more or less intuitive.
 - Graphs are always imported/exported as an **edge list** (hence, they are **directed graphs**).
 - You can switch between directed and undirected graph by pressing 'd'.
 - You can not edit/change the graph in the *result view*. You can leave the result view by pressing 'r'.
+- You can turn off/on the *physics simulation* (tries to come up with a pretty drawing of the graph) by pressing 'q'.
 
 ### Create a random graph
 Click on "Graph" -> "Random".
