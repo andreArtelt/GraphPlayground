@@ -108,6 +108,7 @@ You can delete all files and directories created by `make` by running `make clea
 - [vis.js](https://github.com/almende/vis)
 - [canvas2svg.js](https://github.com/gliffy/canvas2svg)
 - [FileSaver.js](https://github.com/eligrey/FileSaver.js)
+- [SVG-to-PDFKit](https://github.com/alafr/SVG-to-PDFKit)
 
 For building only:
 

@@ -4,6 +4,7 @@ var ui = ui || {};
 
 ui.DefaultGraphFileName = "myGraph.txt";
 ui.DefaultSvgFileName = "myGraph.svg";
+ui.DefaultPdfFileName = "myGraph.pdf";
 ui.svgData = undefined;
 
 ui.Controller = function() {
@@ -72,6 +73,7 @@ ui.Controller = function() {
       document.getElementById("MENU_EXPORT2TEXT").addEventListener("click", this.onClickExportToText.bind(this), false);
       document.getElementById("MENU_EXPORT2FILE").addEventListener("click", this.onClickExportToFile.bind(this), false);
       document.getElementById("MENU_EXPORT2SVG").addEventListener("click", this.onExportSvg.bind(this), false);
+      document.getElementById("MENU_EXPORT2PDF").addEventListener("click", this.onExportPdf.bind(this), false);
       document.getElementById("MENU_PREORDERTRAVERSAL").addEventListener("click", this.onClickPreoderTraversal.bind(this), false);
       document.getElementById("MENU_INORDERTRAVERSAL").addEventListener("click", this.onClickInorderTraversal.bind(this), false);
       document.getElementById("MENU_LEVELORDERTRAVERSAL").addEventListener("click", this.onClickLevelorderTraversal.bind(this), false);
@@ -430,7 +432,7 @@ ui.Controller = function() {
     return utils.export(castings.vis2Graphlib(this.graph, true));
   };
 
-  this.onExportSvg = function() {
+  this.exportToSvg = function(callback) {
     // Credits: Slightly modified version from https://github.com/justinharrell/vis-svg/
     // Setup everything
     C2S.prototype.circle = CanvasRenderingContext2D.prototype.circle;
@@ -447,7 +449,7 @@ ui.Controller = function() {
     C2S.prototype.dashedLine = CanvasRenderingContext2D.prototype.dashedLine;
 
     var networkContainer = this.network.body.container;
-    var ctx = new C2S({width: networkContainer.clientWidth, height: networkContainer.clientWidth});
+    var ctx = new C2S({width: networkContainer.clientWidth, height: networkContainer.clientHeight});
     var canvasProto = this.network.canvas.__proto__;
     var currentGetContext = canvasProto.getContext;
     canvasProto.getContext = function(){
@@ -460,10 +462,28 @@ ui.Controller = function() {
     // Export to .svg
     ctx.waitForComplete(function()
         {
-            var svgData = ctx.getSerializedSvg();
-
-            utils.writeFile(ui.DefaultSvgFileName, svgData, 'image/svg+xml');
+            callback(ctx.getSerializedSvg());
         });
+  };
+
+  this.onExportPdf = function() {
+    this.exportToSvg(function(svgData) {
+      var doc = new PDFDocument({compress: true});
+      SVGtoPDF(doc, svgData, 0, 0);
+
+      var stream = doc.pipe(blobStream());
+      stream.on('finish', function () {
+        var blob = stream.toBlob('application/pdf');
+        saveAs(blob, ui.DefaultPdfFileName, true);
+      });
+      doc.end();
+    });
+  };
+
+  this.onExportSvg = function() {
+    this.exportToSvg(function(svgData) {
+      utils.writeFile(ui.DefaultSvgFileName, svgData, 'image/svg+xml');
+    });
   };
 
   this.onClickExportToFile = function() {

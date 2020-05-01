@@ -126,7 +126,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', [
     'processhtml',
     'concat',
-    'javascript_obfuscator',
+    //'javascript_obfuscator',
     'vulcanize',
     'htmlmin',
     'copy',
