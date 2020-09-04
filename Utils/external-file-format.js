@@ -7,7 +7,6 @@ utils.import = function(data) {
     try {
         // Try to parse JSON
         var jsonData = JSON.parse(data);
-        console.log(jsonData);
         var graphOut = new graphlib.Graph({directed: jsonData.Directed});
         for(var i = 0; i < jsonData.NumNodes; i++) {
             graphOut.setNode('' + i, '' + i);
@@ -94,18 +93,47 @@ utils.import = function(data) {
     
 };
 
-utils.export = function(graph) {
-    var r = "";
+utils.export = function(graph, format) {
+    switch(format) {
+        case 'json':
+            var exportEdges = [];
+            var weighted = true;
+            var edges = graph._edgeObjs;
+            var edgeLabels = graph._edgeLabels;
 
-    for(var i=0; i < graph.edgeCount(); i++) {
-        var e = graph.edges()[i];
+            for(var k in edges) {
+                var Weight = parseFloat(edgeLabels[k]);
+                var NodeA = parseInt(edges[k].v);
+                var NodeB = parseInt(edges[k].w);
+                if(Weight == NaN) {
+                    weighted = false;
+                    exportEdges.push({NodeA, NodeB});
+                } else {
+                    exportEdges.push({NodeA, NodeB, Weight});
+                }
+            }
 
-        r += "{" + String(e.v) + "," + String(e.w);
-        if(graph.edge(e.v, e.w) != undefined) {
-            r += "," + String(graph.edge(e.v, e.w));
-        }
-        r += "}";
+            var exportGraph = {
+                Directed: graph._isDirected,
+                NumNodes: graph._nodeCount,
+                Weighted: weighted,
+                Edges: exportEdges
+            }
+            return JSON.stringify(exportGraph);
+        case 'xml':
+            return 'xml';
+        case 'tuple_reader':
+            var r = "";
+        
+            for(var i=0; i < graph.edgeCount(); i++) {
+                var e = graph.edges()[i];
+        
+                r += "{" + String(e.v) + "," + String(e.w);
+                if(graph.edge(e.v, e.w) != undefined) {
+                    r += "," + String(graph.edge(e.v, e.w));
+                }
+                r += "}";
+            }
+            return r;
     }
-
-    return r;
 };
