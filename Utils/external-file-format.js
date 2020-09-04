@@ -3,20 +3,25 @@
 var utils = utils || {};
 
 utils.import = function(data) {
-    var graphOut = new graphlib.Graph();
 
     try {
         // Try to parse JSON
         var jsonData = JSON.parse(data);
+        console.log(jsonData);
+        var graphOut = new graphlib.Graph({directed: jsonData.Directed});
         for(var i = 0; i < jsonData.NumNodes; i++) {
-            graphOut.setNode(i, '' + i);
+            graphOut.setNode('' + i, '' + i);
         }
 
         jsonData.Edges.forEach(edge => {
             var NodeA = '' + edge.NodeA;
             var NodeB = '' + edge.NodeB;
-            var Weight = jsonData.Weighted ? '' + edge.Weight : '';
-            graphOut.setEdge(NodeA, NodeB, Weight);
+            if(jsonData.Weighted) {
+                var Weight =  '' + edge.Weight;
+                graphOut.setEdge(NodeA, NodeB, Weight);
+            } else {
+                graphOut.setEdge(NodeA, NodeB);
+            }
         });
 
         return graphOut;
@@ -32,23 +37,30 @@ utils.import = function(data) {
             var directed = info.getAttribute('directed');
             var weighted = info.getAttribute('weighted');
 
+            var graphOut = new graphlib.Graph({directed});
+
             for(var i = 0; i < numNodes; i++) {
-                graphOut.setNode(i, '' + i);
+                graphOut.setNode('' + i, '' + i);
             }
 
             for(i in edges) {
                 try {
                     var nodeA = edges[i].getAttribute('nodeA');
                     var nodeB = edges[i].getAttribute('nodeB');
-                    var weight = edges[i].getAttribute('weight');
-                    graphOut.setEdge(nodeA, nodeB, weight);
-                } catch(e) {} // Not an edge node
+                    if(weighted) {
+                        var weight = edges[i].getAttribute('weight');
+                        graphOut.setEdge(nodeA, nodeB, weight);
+                    } else {
+                        graphOut.setEdge(nodeA, nodeB);
+                    }
+                } catch(e) {} // Not an XML node of type edge
             }
 
             return graphOut;
                 
         } catch(e) {
             // Parse TupleReader
+            var graphOut = new graphlib.Graph();
             var curSubStr = "";
             for(var i=0; i < data.length; i++) {
                 if(data[i] == '{') {
