@@ -121,7 +121,29 @@ utils.export = function(graph, format) {
             }
             return JSON.stringify(exportGraph);
         case 'xml':
-            return 'xml';
+            var weighted = true;
+            var edges = graph._edgeObjs;
+            var edgeLabels = graph._edgeLabels;
+            var edgeString = '';
+
+            for(var k in edges) {
+                var weight = parseFloat(edgeLabels[k]);
+                var nodeA = parseInt(edges[k].v);
+                var nodeB = parseInt(edges[k].w);
+                if(weight == NaN) {
+                    weighted = false;
+                    edgeString += '    <edge nodeA="' + nodeA + '" nodeB="' + nodeB + '"/>\n';
+                } else {
+                    edgeString += '    <edge nodeA="' + nodeA + '" nodeB="' + nodeB + '" weight="' + weight + '"/>\n';
+                }
+            }
+            var xmlString = '<?xml version="1.0" encoding="utf-8"?>\n'
+            + '<mygraph>\n'
+            + '  <info numNodes="' + graph._nodeCount + '" directed="' + graph._isDirected + '" weighted="' + weighted + '" />\n'
+            + '  <edges>\n'
+            + edgeString + '  </edges>\n'
+            + '</mygraph>\n';
+            return xmlString;
         case 'tuple_reader':
             var r = "";
         

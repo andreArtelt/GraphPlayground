@@ -515,7 +515,7 @@ ui.Controller = function() {
         utils.writeFile(ui.DefaultGraphFileName + '.json', content);
         break;
       case 'xml':
-        //utils.writeFile(ui.DefaultGraphFileName + '.xml', content);
+        utils.writeFile(ui.DefaultGraphFileName + '.xml', content);
         break;
       case 'tuple_reader':
         utils.writeFile(ui.DefaultGraphFileName + '.txt', content);
