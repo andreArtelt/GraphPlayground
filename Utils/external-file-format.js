@@ -105,7 +105,7 @@ utils.export = function(graph, format) {
                 var Weight = parseFloat(edgeLabels[k]);
                 var NodeA = parseInt(edges[k].v);
                 var NodeB = parseInt(edges[k].w);
-                if(Weight == NaN) {
+                if(isNaN(Weight)) {
                     weighted = false;
                     exportEdges.push({NodeA, NodeB});
                 } else {
@@ -124,26 +124,41 @@ utils.export = function(graph, format) {
             var weighted = true;
             var edges = graph._edgeObjs;
             var edgeLabels = graph._edgeLabels;
-            var edgeString = '';
 
+            // Create XML Document
+            var xmlDoc = document.implementation.createDocument("", "", null);
+            var xmlMyGraph = xmlDoc.createElement('mygraph');
+
+            var xmlEdges = xmlDoc.createElement('edges');
             for(var k in edges) {
+                var xmlEdge = xmlDoc.createElement('edge');
                 var weight = parseFloat(edgeLabels[k]);
                 var nodeA = parseInt(edges[k].v);
                 var nodeB = parseInt(edges[k].w);
-                if(weight == NaN) {
+                if(isNaN(weight)) {
+                    xmlEdge.setAttribute('nodeA', '' + nodeA);
+                    xmlEdge.setAttribute('nodeB', '' + nodeB);
                     weighted = false;
-                    edgeString += '    <edge nodeA="' + nodeA + '" nodeB="' + nodeB + '"/>\n';
                 } else {
-                    edgeString += '    <edge nodeA="' + nodeA + '" nodeB="' + nodeB + '" weight="' + weight + '"/>\n';
+                    xmlEdge.setAttribute('nodeA', '' + nodeA);
+                    xmlEdge.setAttribute('nodeB', '' + nodeB);
+                    xmlEdge.setAttribute('weight', '' + weight);
                 }
+                xmlEdges.appendChild(xmlEdge);
             }
-            var xmlString = '<?xml version="1.0" encoding="utf-8"?>\n'
-            + '<mygraph>\n'
-            + '  <info numNodes="' + graph._nodeCount + '" directed="' + graph._isDirected + '" weighted="' + weighted + '" />\n'
-            + '  <edges>\n'
-            + edgeString + '  </edges>\n'
-            + '</mygraph>\n';
-            return xmlString;
+
+            var xmlInfo = xmlDoc.createElement('info');
+            xmlInfo.setAttribute('numNodes', '' + graph._nodeCount);
+            xmlInfo.setAttribute('directed', '' + graph._isDirected);
+            xmlInfo.setAttribute('weighted', '' + weighted);
+            xmlMyGraph.appendChild(xmlInfo);
+
+            xmlMyGraph.appendChild(xmlEdges);
+            xmlDoc.appendChild(xmlMyGraph);
+
+            var serializer = new XMLSerializer();
+            return serializer.serializeToString(xmlDoc);
+            
         case 'tuple_reader':
             var r = "";
         
