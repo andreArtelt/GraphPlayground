@@ -34,11 +34,11 @@ utils.import = function(data, setDirectedCb) {
             var info = xmlData.children[0].children[0];
             var edges = xmlData.children[0].children[1].children;
             var numNodes = info.getAttribute('numNodes');
-            var directed = info.getAttribute('directed');
+            var directed = (info.getAttribute('directed') == 'true');
             var weighted = info.getAttribute('weighted');
 
             var graphOut = new graphlib.Graph();
-            setDirectedCb(jsonData.Directed);
+            setDirectedCb(directed);
 
             for(var i = 0; i < numNodes; i++) {
                 graphOut.setNode('' + i, '' + i);
