@@ -408,8 +408,12 @@ ui.Controller = function() {
     this.redraw();
   };
 
+  this.setDirectedCb = function(b) {
+    this.directedGraph = b;
+  }
+
   this.importGraph = function(data) {
-    return this.graphlib2Vis(utils.import(data));
+    return this.graphlib2Vis(utils.import(data, this.setDirectedCb.bind(this)));
   };
 
   this.onClickImportFromText = function() {
@@ -439,7 +443,7 @@ ui.Controller = function() {
   };
 
   this.exportGraph = function(format) {
-    return utils.export(castings.vis2Graphlib(this.graph, true), format);
+    return utils.export(castings.vis2Graphlib(this.graph, true), format, this.directedGraph);
   };
 
   this.exportToSvg = function(callback) {

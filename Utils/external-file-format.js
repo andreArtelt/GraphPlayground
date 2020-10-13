@@ -2,12 +2,13 @@
 
 var utils = utils || {};
 
-utils.import = function(data) {
+utils.import = function(data, setDirectedCb) {
 
     try {
         // Try to parse JSON
         var jsonData = JSON.parse(data);
-        var graphOut = new graphlib.Graph({directed: jsonData.Directed});
+        setDirectedCb(jsonData.Directed);
+        var graphOut = new graphlib.Graph();
         for(var i = 0; i < jsonData.NumNodes; i++) {
             graphOut.setNode('' + i, '' + i);
         }
@@ -36,7 +37,8 @@ utils.import = function(data) {
             var directed = info.getAttribute('directed');
             var weighted = info.getAttribute('weighted');
 
-            var graphOut = new graphlib.Graph({directed});
+            var graphOut = new graphlib.Graph();
+            setDirectedCb(jsonData.Directed);
 
             for(var i = 0; i < numNodes; i++) {
                 graphOut.setNode('' + i, '' + i);
@@ -93,7 +95,7 @@ utils.import = function(data) {
     
 };
 
-utils.export = function(graph, format) {
+utils.export = function(graph, format, directed) {
     switch(format) {
         case 'json':
             var exportEdges = [];
@@ -114,7 +116,7 @@ utils.export = function(graph, format) {
             }
 
             var exportGraph = {
-                Directed: graph._isDirected,
+                Directed: directed,
                 NumNodes: graph._nodeCount,
                 Weighted: weighted,
                 Edges: exportEdges
@@ -149,7 +151,7 @@ utils.export = function(graph, format) {
 
             var xmlInfo = xmlDoc.createElement('info');
             xmlInfo.setAttribute('numNodes', '' + graph._nodeCount);
-            xmlInfo.setAttribute('directed', '' + graph._isDirected);
+            xmlInfo.setAttribute('directed', '' + directed);
             xmlInfo.setAttribute('weighted', '' + weighted);
             xmlMyGraph.appendChild(xmlInfo);
 
