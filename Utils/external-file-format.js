@@ -48,6 +48,12 @@ utils.import = function(data, setDirectedCb) {
                 try {
                     var nodeA = edges[i].getAttribute('nodeA');
                     var nodeB = edges[i].getAttribute('nodeB');
+
+                    // Check if opposite edge is already present when undirected
+                    if(!directed && graphOut.outEdges(nodeB).map(({v, w}) => w).includes(nodeA)) {
+                        continue;
+                    }
+
                     if(weighted) {
                         var weight = edges[i].getAttribute('weight');
                         graphOut.setEdge(nodeA, nodeB, weight);
