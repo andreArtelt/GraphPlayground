@@ -58,7 +58,7 @@ utils.readFileAsync = function(callback) {
     // Create invisible input field and click on it
     var fileInput = document.createElement("INPUT");
     fileInput.setAttribute("type", "file");
-    fileInput.setAttribute("accept", ".txt");
+    fileInput.setAttribute("accept", ".txt, .xml, .json");
     fileInput.style.display = 'none';
     fileInput.addEventListener("change", () => {
         utils.readFileAsStringAsync(fileInput.files[0], callback);

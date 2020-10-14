@@ -146,10 +146,19 @@ div.table_description {
     display: none;
 }
 
+#nav li:hover ul ul ul {
+    display: none;
+}
+
 #nav li:hover ul {
     display: block;
 } 
 #nav li li:hover ul {
+    margin-left: 200px;
+    margin-top: -35px;
+    display:block;
+}
+#nav li li li:hover ul {
     margin-left: 200px;
     margin-top: -35px;
     display:block;

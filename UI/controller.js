@@ -2,7 +2,7 @@
 
 var ui = ui || {};
 
-ui.DefaultGraphFileName = "myGraph.txt";
+ui.DefaultGraphFileName = "myGraph";
 ui.DefaultSvgFileName = "myGraph.svg";
 ui.DefaultPdfFileName = "myGraph.pdf";
 ui.svgData = undefined;
@@ -72,7 +72,9 @@ ui.Controller = function() {
       document.getElementById("MENU_IMPORTFROMTEXT").addEventListener("click", this.onClickImportFromText.bind(this), false);
       document.getElementById("MENU_IMPORTFROMFILE").addEventListener("click", this.onClickImportFromFile.bind(this), false);
       document.getElementById("MENU_EXPORT2TEXT").addEventListener("click", this.onClickExportToText.bind(this), false);
-      document.getElementById("MENU_EXPORT2FILE").addEventListener("click", this.onClickExportToFile.bind(this), false);
+      document.getElementById("MENU_EXPORT2JSON").addEventListener("click", this.onClickExportToFileJSON.bind(this), false);
+      document.getElementById("MENU_EXPORT2XML").addEventListener("click", this.onClickExportToFileXML.bind(this), false);
+      document.getElementById("MENU_EXPORT2TUPLEREADER").addEventListener("click", this.onClickExportToFileTupleReader.bind(this), false);
       document.getElementById("MENU_EXPORT2SVG").addEventListener("click", this.onExportSvg.bind(this), false);
       document.getElementById("MENU_EXPORT2PDF").addEventListener("click", this.onExportPdf.bind(this), false);
       document.getElementById("MENU_PREORDERTRAVERSAL").addEventListener("click", this.onClickPreoderTraversal.bind(this), false);
@@ -406,8 +408,12 @@ ui.Controller = function() {
     this.redraw();
   };
 
+  this.setDirectedCb = function(b) {
+    this.directedGraph = b;
+  }
+
   this.importGraph = function(data) {
-    return this.graphlib2Vis(utils.import(data));
+    return this.graphlib2Vis(utils.import(data, this.setDirectedCb.bind(this)));
   };
 
   this.onClickImportFromText = function() {
@@ -436,8 +442,8 @@ ui.Controller = function() {
     });
   };
 
-  this.exportGraph = function() {
-    return utils.export(castings.vis2Graphlib(this.graph, true));
+  this.exportGraph = function(format) {
+    return utils.export(castings.vis2Graphlib(this.graph, true), format, this.directedGraph);
   };
 
   this.exportToSvg = function(callback) {
@@ -494,12 +500,35 @@ ui.Controller = function() {
     });
   };
 
-  this.onClickExportToFile = function() {
-    utils.writeFile(ui.DefaultGraphFileName, this.exportGraph());
+  this.onClickExportToFileJSON = function() {
+    this.onClickExportToFile('json');
+  };
+
+  this.onClickExportToFileXML = function() {
+    this.onClickExportToFile('xml');
+  };
+
+  this.onClickExportToFileTupleReader = function() {
+    this.onClickExportToFile('tuple_reader');
+  };
+
+  this.onClickExportToFile = function(format) {
+    var content = this.exportGraph(format);
+    switch(format) {
+      case 'json':
+        utils.writeFile(ui.DefaultGraphFileName + '.json', content);
+        break;
+      case 'xml':
+        utils.writeFile(ui.DefaultGraphFileName + '.xml', content);
+        break;
+      case 'tuple_reader':
+        utils.writeFile(ui.DefaultGraphFileName + '.txt', content);
+        break;
+    }
   };
 
   this.onClickExportToText = function() {
-    new ui.ExportDlg(this.exportGraph()).show();
+    new ui.ExportDlg(this.exportGraph('tuple_reader')).show();
   };
 
   this.doAddRemovedEdgesAsDashedEdges = function() {
